@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Playwright artifacts
+reports/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Self-healing: per-worker event files are transient; the consolidated
+# healing-store.json IS tracked so healed selectors survive between runs/machines.
+.healing/events/
+
+# Environment
+.env
+.env.local
+
+# OS / editor
+.DS_Store
+*.log
+dist/

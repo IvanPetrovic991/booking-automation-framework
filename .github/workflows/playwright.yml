@@ -1,0 +1,137 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Nightly full regression at 03:00 UTC (push/PR runs stay on @smoke)
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      grep:
+        description: 'Tag filter (e.g. @smoke, @stays, @regression)'
+        required: false
+        default: '@smoke'
+
+# Newer pushes to the same PR cancel superseded runs; scheduled runs are
+# keyed by run id so nightly regressions are never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'schedule' && github.run_id || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Format check
+        run: npm run format:check
+
+  test:
+    needs: static-checks
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/2, 2/2]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright OS dependencies (browser cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run tests (shard ${{ matrix.shard }})
+        # The tag filter is passed through an env var, never interpolated into
+        # the shell script — workflow_dispatch input is untrusted text.
+        env:
+          CI: 'true'
+          GREP: ${{ github.event.inputs.grep || (github.event_name == 'schedule' && '@regression') || '@smoke' }}
+        run: npx playwright test --project=chromium --shard=${{ matrix.shard }} --grep "$GREP"
+
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: blob-report-${{ strategy.job-index }}
+          path: reports/blob
+          retention-days: 3
+
+      # Heals on CI are visible as artifacts (and in the healing summary in the
+      # job log). They are NOT fed back into the repo automatically — the
+      # committed store only changes when a developer commits it locally.
+      - name: Upload healing store
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: healing-store-${{ strategy.job-index }}
+          path: .healing/healing-store.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  merge-report:
+    # Merge even when tests failed (that report is the valuable one), but not
+    # when the test job was skipped or the workflow was cancelled.
+    if: ${{ !cancelled() && needs.test.result != 'skipped' }}
+    needs: test
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: blob-report-*
+          path: reports/blob
+          merge-multiple: true
+
+      - name: Merge shard reports into HTML
+        run: npx playwright merge-reports --reporter html reports/blob
+
+      - name: Upload merged HTML report
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-html-report
+          path: playwright-report
+          retention-days: 14

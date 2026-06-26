@@ -1,0 +1,82 @@
+{
+  "preferred": {
+    "flights.results.flightCards": "[aria-label^=\"Result item\"]",
+    "flights.results.cardPrice": "[aria-label^=\"Result item\"] a[href*=\"/book/flight\"]"
+  },
+  "events": [
+    {
+      "kind": "healed",
+      "key": "cars.search.pickupInput",
+      "description": "Pick-up location input",
+      "failedSelectors": [
+        "input[aria-label=\"Pick-up location\"]"
+      ],
+      "healedSelector": "role=combobox[name=\"Pick-up location\"]",
+      "persistPreferred": true,
+      "url": "https://www.booking.com/cars/index.html",
+      "timestamp": "2026-07-03T16:45:31.772Z"
+    },
+    {
+      "kind": "healed",
+      "key": "cars.search.autocompleteOptions",
+      "description": "Pick-up location autocomplete options",
+      "failedSelectors": [
+        "[data-testid=\"list-item\"]",
+        "ul[role=\"listbox\"] li"
+      ],
+      "healedSelector": "[role=\"option\"]",
+      "persistPreferred": true,
+      "url": "https://www.booking.com/cars/index.html",
+      "timestamp": "2026-07-03T16:45:34.921Z"
+    },
+    {
+      "kind": "healed",
+      "key": "flights.results.flightCards",
+      "description": "Flight offer cards (native booking.com or Kayak white-label)",
+      "failedSelectors": [
+        "[data-testid=\"searchresults_card\"]",
+        "[data-ui-name=\"flight_card\"]"
+      ],
+      "healedSelector": "[aria-label^=\"Result item\"]",
+      "persistPreferred": true,
+      "url": "https://booking.kayak.com/flights/BEG-LHR/2026-08-17",
+      "timestamp": "2026-07-03T16:45:52.732Z"
+    },
+    {
+      "kind": "healed",
+      "key": "flights.results.cardPrice",
+      "description": "Flight offer price (native or Kayak variant)",
+      "failedSelectors": [
+        "[data-testid=\"flight_card_price_main_price\"]",
+        "[data-testid=\"searchresults_card\"] [class*=\"price\"]"
+      ],
+      "healedSelector": "[aria-label^=\"Result item\"] a[href*=\"/book/flight\"]",
+      "persistPreferred": true,
+      "url": "https://booking.kayak.com/flights/BEG-LHR/2026-08-17",
+      "timestamp": "2026-07-03T16:45:57.245Z"
+    },
+    {
+      "kind": "recovered",
+      "key": "cars.search.pickupInput",
+      "description": "Pick-up location input",
+      "failedSelectors": [],
+      "healedSelector": "role=combobox[name=\"Pick-up location\"]",
+      "previousPreferred": "role=combobox[name=\"Pick-up location\"]",
+      "persistPreferred": false,
+      "url": "https://www.booking.com/cars/index.html",
+      "timestamp": "2026-09-05T14:54:40.829Z"
+    },
+    {
+      "kind": "recovered",
+      "key": "cars.search.autocompleteOptions",
+      "description": "Pick-up location autocomplete options",
+      "failedSelectors": [],
+      "healedSelector": "[role=\"option\"]",
+      "previousPreferred": "[role=\"option\"]",
+      "persistPreferred": false,
+      "url": "https://www.booking.com/cars/index.html",
+      "timestamp": "2026-09-05T14:54:41.900Z"
+    }
+  ],
+  "updatedAt": "2026-09-05T14:56:35.678Z"
+}

@@ -1,0 +1,62 @@
+{
+  "name": "self-healing-playwright-framework",
+  "version": "1.0.0",
+  "description": "Portfolio E2E automation framework — Playwright + TypeScript, Page Object Model, self-healing locators — demonstrated against booking.com as the example target. Independent project, not affiliated with Booking.com.",
+  "private": true,
+  "license": "MIT",
+  "author": "Ivan Petrovic (https://github.com/IvanPetrovic991)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IvanPetrovic991/self-healing-playwright-framework.git"
+  },
+  "homepage": "https://github.com/IvanPetrovic991/self-healing-playwright-framework#readme",
+  "keywords": [
+    "playwright",
+    "typescript",
+    "e2e",
+    "test-automation",
+    "self-healing",
+    "page-object-model",
+    "portfolio"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:chromium": "playwright test --project=chromium",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "test:stays": "playwright test --grep @stays",
+    "test:flights": "playwright test --grep @flights",
+    "test:cars": "playwright test --grep @cars",
+    "test:attractions": "playwright test --grep @attractions",
+    "test:healer": "playwright test --grep @healer",
+    "test:a11y": "playwright test --grep @a11y",
+    "test:api": "playwright test --grep @api",
+    "test:failed": "playwright test --last-failed",
+    "report": "playwright show-report reports/html",
+    "report:merge": "playwright merge-reports --reporter html reports/blob",
+    "healing:show": "node -e \"const f='.healing/healing-store.json';const fs=require('fs');console.log(fs.existsSync(f)?fs.readFileSync(f,'utf8'):'Healing store is empty — no healed selectors yet.')\"",
+    "healing:reset": "node -e \"require('fs').rmSync('.healing',{recursive:true,force:true});console.log('Healing store cleared.')\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "docs:screenshots": "playwright test --config playwright.docs.config.ts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^24.10.1",
+    "dotenv": "^17.2.3",
+    "eslint": "^9.39.0",
+    "eslint-plugin-playwright": "^2.10.4",
+    "prettier": "^3.8.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4"
+  }
+}
